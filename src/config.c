@@ -1330,7 +1330,7 @@ static int config_parse_http_path(int argc, char *argv[], void *data)
         return -1;
     }
 
-    if (path[0] != '/') {
+    if (path[0] != '/' && path[0] != '`') {
         return -1;
     }
 

@@ -53,6 +53,7 @@
 #define HTTP_RSP_FORMAT         \
     "HTTP/1.1 200 OK\r\n"       \
     "Content-Length:%11d\r\n"   \
+    "Content-Type:application/json\r\n"   \
     "Server: dperf\r\n"         \
     "Connection:keep-alive\r\n" \
     "\r\n"                      \
@@ -77,6 +78,26 @@ static void http_set_payload_client(struct config *cfg, char *dest, int len, int
     int pad = 0;
     int extra_len = 0;
     char buf[MBUF_DATA_SIZE] = {0};
+    char path_buf[HTTP_PATH_MAX] = {0};
+
+    if (cfg->http_path[0] == '`') {
+        int path_len = 20;
+        // random path
+        int path_i = 0;
+        int num = 'z' - 'a' + 1;
+        struct timeval tv;
+        
+        gettimeofday(&tv, NULL);
+        srandom(tv.tv_usec);
+        path_buf[0] = '/';
+        
+        for (path_i = 1; path_i < path_len; path_i++) {
+            path_buf[path_i] = 'a' + random() % num;
+        }
+
+        path_buf[path_len] = 0;
+        memcpy(cfg->http_path, path_buf, path_len);
+    }
 
     extra_len = strlen(cfg->http_path) + strlen(cfg->http_host) - strlen(HTTP_HOST_DEFAULT) - strlen(HTTP_PATH_DEFAULT);
     if (payload_size <= 0) {
